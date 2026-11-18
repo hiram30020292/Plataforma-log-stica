@@ -14,8 +14,8 @@ logística de MCL. La app móvil (Flutter) se construirá aparte y consumirá es
 ## Instalación
 
 ```bash
-git clone https://github.com/hiram30020292/plataforma-log-stica.git
-cd plataforma-log-stica
+git clone https://github.com/hiram30020292/Plataforma-log-stica.git
+cd Plataforma-log-stica
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -e ".[dev]"
