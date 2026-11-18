@@ -32,7 +32,7 @@ Todo se ejecuta desde la raíz del proyecto:
 ```bash
 python3 -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
-uvicorn mcl.api:create_app --factory --reload  # API en http://127.0.0.1:8000, docs en /docs
+uvicorn mcl.api:create_app --factory --reload  # API en http://127.0.0.1:8000 (abre /docs)
 pytest                 # tests
 ruff check .           # lint
 ruff format --check .  # formato (ruff format . para aplicarlo)

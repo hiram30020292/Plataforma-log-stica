@@ -5,7 +5,7 @@ from http import HTTPStatus
 from typing import Annotated, Literal
 
 from fastapi import APIRouter, Depends, FastAPI, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 from pydantic import BaseModel
 
 from mcl import __version__
@@ -50,6 +50,12 @@ class ErrorResponse(BaseModel):
 
 
 _sistema = APIRouter(tags=["sistema"])
+
+
+@_sistema.get("/", include_in_schema=False)
+def root() -> RedirectResponse:
+    """Lleva a la documentación interactiva al abrir la raíz del servidor."""
+    return RedirectResponse(url="/docs")
 
 
 @_sistema.get("/health")

@@ -38,6 +38,13 @@ def test_health_indica_que_el_servicio_esta_vivo() -> None:
     }
 
 
+def test_la_raiz_lleva_a_la_documentacion() -> None:
+    respuesta = TestClient(create_app()).get("/", follow_redirects=False)
+
+    assert respuesta.status_code == 307
+    assert respuesta.headers["location"] == "/docs"
+
+
 def test_la_documentacion_interactiva_esta_disponible() -> None:
     respuesta = TestClient(create_app()).get("/docs")
 
