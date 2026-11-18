@@ -53,11 +53,10 @@ class TestConfiguracion:
 
         assert get_settings().debug is True
 
-    def test_variable_mcl_desconocida_en_env_es_un_error(self, tmp_path: Path) -> None:
-        (tmp_path / ".env").write_text("MCL_DEBUGG=true\n", encoding="utf-8")
+    def test_ignora_variables_ajenas_en_el_archivo_env(self, tmp_path: Path) -> None:
+        (tmp_path / ".env").write_text("OTRA_HERRAMIENTA=1\nMCL_DEBUG=true\n", encoding="utf-8")
 
-        with pytest.raises(ConfiguracionError):
-            get_settings()
+        assert get_settings().debug is True
 
     def test_get_settings_reutiliza_la_misma_instancia(self) -> None:
         assert get_settings() is get_settings()
