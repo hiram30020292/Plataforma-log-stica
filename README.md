@@ -26,6 +26,19 @@ En Windows, crea el entorno con `py -m venv .venv` y actívalo con `.venv\Script
 Configuración local (opcional): copia `.env.example` como `.env` y edita los valores.
 El archivo `.env` nunca se sube al repositorio.
 
+## Ejecutar la API
+
+```bash
+uvicorn mcl.api:create_app --factory --reload
+```
+
+Con el servidor encendido, abre en el navegador:
+
+- http://127.0.0.1:8000/health: estado del servicio.
+- http://127.0.0.1:8000/docs: documentación interactiva para probar la API.
+
+Para detenerlo, pulsa `Ctrl+C`.
+
 ## Verificar que todo funciona
 
 ```bash
@@ -39,6 +52,7 @@ mypy                   # tipos
 
 ```
 src/mcl/
+├── api/     API con FastAPI (rutas y respuestas de error)
 ├── core/    configuración, excepciones y tipos compartidos
 └── utils/   funciones auxiliares puras
 tests/       tests (espejo de src/mcl)

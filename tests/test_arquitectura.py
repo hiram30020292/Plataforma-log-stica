@@ -59,3 +59,15 @@ def test_las_capas_base_respetan_la_direccion_de_dependencias(capa: str) -> None
     }
 
     assert not violaciones, f"{capa} importa algo que no debe: {sorted(violaciones)}"
+
+
+def test_solo_la_capa_api_importa_de_api() -> None:
+    violaciones = {
+        f"{archivo.relative_to(_RAIZ)} importa {modulo}"
+        for archivo in _RAIZ.rglob("*.py")
+        if archivo.relative_to(_RAIZ).parts[0] != "api"
+        for modulo in _imports_de_mcl(archivo)
+        if modulo == "mcl.api" or modulo.startswith("mcl.api.")
+    }
+
+    assert not violaciones, f"Solo mcl.api puede importar de mcl.api: {sorted(violaciones)}"
