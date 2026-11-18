@@ -1,0 +1,102 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mcl"
+dynamic = ["version"]
+description = "MCL - Corregidora Móvil Logistics: API de gestión de flotilla y logística."
+requires-python = ">=3.12"
+dependencies = [
+    "pydantic-settings>=2.6",
+]
+
+[project.optional-dependencies]
+dev = [
+    "mypy>=1.13",
+    "pytest>=8.3",
+    "ruff>=0.8",
+]
+
+# --------------------------------------------------------------------------- empaquetado
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+mcl = ["py.typed"]
+
+[tool.setuptools.dynamic]
+version = { attr = "mcl.__version__" }
+
+# --------------------------------------------------------------------------- pytest
+[tool.pytest.ini_options]
+minversion = "8.0"
+pythonpath = ["src"]
+testpaths = ["tests"]
+addopts = ["-ra", "--strict-markers", "--strict-config"]
+xfail_strict = true
+
+# --------------------------------------------------------------------------- ruff
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = [
+    "E", "W",  # pycodestyle
+    "F",       # pyflakes
+    "I",       # orden de imports
+    "N",       # nombres (PEP 8)
+    "UP",      # sintaxis moderna de Python
+    "B",       # errores probables (bugbear)
+    "A",       # no ocultar builtins
+    "C4",      # comprensiones
+    "DTZ",     # fechas siempre con zona horaria
+    "T20",     # nada de print()
+    "PIE",     # código innecesario
+    "PT",      # estilo de pytest
+    "RET",     # returns
+    "SIM",     # simplificaciones
+    "TID",     # imports absolutos y APIs prohibidas
+    "ARG",     # argumentos sin usar
+    "PTH",     # pathlib en lugar de os.path
+    "ERA",     # código comentado
+    "S",       # seguridad (bandit)
+    "PL",      # pylint
+    "RUF",     # reglas propias de ruff
+]
+
+[tool.ruff.lint.per-file-ignores]
+# El nombre types.py lo fija la arquitectura; siempre se importa como mcl.core.types.
+"src/mcl/core/types.py" = ["A005"]
+# En los tests, assert y los valores literales son lo normal.
+"tests/**/*.py" = ["S101", "PLR2004"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["mcl"]
+
+[tool.ruff.lint.flake8-tidy-imports]
+ban-relative-imports = "all"
+
+[tool.ruff.lint.flake8-tidy-imports.banned-api]
+"os.environ".msg = "Lee la configuración con mcl.core.get_settings()."
+"os.getenv".msg = "Lee la configuración con mcl.core.get_settings()."
+
+# --------------------------------------------------------------------------- mypy
+[tool.mypy]
+python_version = "3.12"
+mypy_path = "src"
+files = ["src", "tests"]
+strict = true
+warn_unreachable = true
+enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool", "possibly-undefined"]
+plugins = ["pydantic.mypy"]
+
+[tool.pydantic-mypy]
+init_forbid_extra = true
+init_typed = true
+warn_required_dynamic_aliases = true
