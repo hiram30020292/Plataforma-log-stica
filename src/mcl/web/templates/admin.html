@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% from "_macros.html" import icono, logo %}
+{% block cuerpo %}
+<div class="admin">
+  <aside class="admin-side">
+    {{ logo() }}
+    <nav aria-label="Panel administrativo">
+      {% for clave, ruta_sec, texto, ico in [
+        ("tablero", "/admin", "Tablero", "chart"),
+        ("envios", "/admin/envios", "Solicitudes", "list"),
+        ("transportistas", "/admin/transportistas", "Transportistas", "truck"),
+      ] %}
+      <a href="{{ ruta_sec }}"{% if seccion == clave %} class="on" aria-current="page"{% endif %}>{{ icono(ico) }}<span>{{ texto }}</span></a>
+      {% endfor %}
+    </nav>
+    <a href="/" class="admin-exit">{{ icono('logout') }}<span>Volver a la app</span></a>
+  </aside>
+  <main class="admin-main">
+{% block contenido %}{% endblock %}
+  </main>
+</div>
+{% endblock %}

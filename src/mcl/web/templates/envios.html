@@ -1,0 +1,27 @@
+{% extends "app.html" %}
+{% from "_macros.html" import icono, barra, fila_envio, vacio %}
+{% block titulo %}Mis envíos{% endblock %}
+{% block contenido %}
+{% call barra('Mis envíos') %}<a class="icon-btn" href="/envios" aria-label="{{ novedades }} envíos con novedades">{{ icono('bell') }}{% if novedades %}<i class="dot">{{ novedades }}</i>{% endif %}</a>{% endcall %}
+<section class="section">
+  <div class="company"><span class="avatar">{{ icono('building') }}</span><div><b>{{ prefs.empresa }}</b><small class="muted">Cliente</small></div><a class="btn btn-sm btn-ghost" href="/perfil">Editar</a></div>
+  <a class="kpi-dark" href="/envios">
+    <span class="kpi-ico">{{ icono('box') }}</span><span><small>Mis envíos activos</small><b>{{ activos | length }}</b></span>{{ icono('chev') }}
+  </a>
+  <a class="btn btn-primary btn-block btn-lg" href="/solicitar">{{ icono('plus') }} Crear nueva solicitud</a>
+</section>
+<section class="section">
+  <div class="section-head"><h2>Mis solicitudes</h2></div>
+  <nav class="tabs" aria-label="Filtrar solicitudes">
+    <a href="/envios"{% if vista == 'activas' %} aria-current="page"{% endif %}>Activas ({{ activos | length }})</a>
+    <a href="/envios?vista=historial"{% if vista == 'historial' %} aria-current="page"{% endif %}>Historial ({{ historial | length }})</a>
+  </nav>
+  <div class="rlist">
+    {% for envio in lista %}
+    {{ fila_envio(envio) }}
+    {% else %}
+    {% call vacio('No tienes envíos activos' if vista == 'activas' else 'Sin historial', 'Crea una solicitud y elige a tu transportista.') %}<a class="btn btn-ghost" href="/buscar">Buscar transportistas</a>{% endcall %}
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

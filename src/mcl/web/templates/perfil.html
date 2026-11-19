@@ -1,0 +1,38 @@
+{% extends "app.html" %}
+{% from "_macros.html" import icono, barra %}
+{% block titulo %}Perfil{% endblock %}
+{% block contenido %}
+{{ barra('Perfil') }}
+<section class="section">
+  <h2>Modo de uso</h2>
+  <p class="muted small">Prueba la plataforma desde los tres tipos de usuario.</p>
+  <div class="roles">
+    {% for rol, descripcion, ico in [
+      (Rol.CLIENTE, 'Negocio que contrata transporte', 'building'),
+      (Rol.TRANSPORTISTA, 'Recibe y atiende solicitudes', 'truck'),
+      (Rol.ADMINISTRADOR, 'Supervisa toda la plataforma', 'chart'),
+    ] %}
+    <a class="role{% if prefs.rol == rol %} on{% endif %}" href="/modo/{{ rol.value }}?siguiente=/perfil"{% if prefs.rol == rol %} aria-current="true"{% endif %}>{{ icono(ico) }}<span><b>{{ rol.etiqueta }}</b><small>{{ descripcion }}</small></span>{% if prefs.rol == rol %}{{ icono('check') }}{% endif %}</a>
+    {% endfor %}
+  </div>
+</section>
+<form class="section form" method="post" action="/perfil">
+  <h2>Datos</h2>
+  <div class="field"><label for="pf-empresa">Nombre de tu empresa (cliente)</label><input id="pf-empresa" name="empresa" value="{{ prefs.empresa }}" required maxlength="60"></div>
+  <div class="field"><label for="pf-transportista">Operar como transportista</label>
+    <select id="pf-transportista" name="transportista">
+      {% for x in transportistas %}<option value="{{ x.id }}"{% if transportista and x.id == transportista.id %} selected{% endif %}>{{ x.nombre }}</option>{% endfor %}
+    </select></div>
+  <button class="btn btn-primary btn-block">Guardar cambios</button>
+</form>
+<section class="section">
+  <a class="btn btn-ghost btn-block" href="/registro">{{ icono('truck') }} Registrar una empresa de transporte</a>
+  <a class="btn btn-ghost btn-block" href="/docs">{{ icono('list') }} Ver la API para la app móvil</a>
+  {% if demo_data %}
+  <form method="post" action="/perfil/restablecer" data-confirmar="¿Restablecer los datos de ejemplo? Se perderán los cambios de la demostración.">
+    <button class="btn btn-ghost-danger btn-block">Restablecer datos de ejemplo</button>
+  </form>
+  {% endif %}
+  <p class="muted small center">MCL · Corregidora Móvil Logistics · versión {{ version }}</p>
+</section>
+{% endblock %}

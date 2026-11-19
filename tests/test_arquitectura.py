@@ -18,7 +18,7 @@ _DEPENDENCIAS_PERMITIDAS: dict[str, tuple[str, ...]] = {
     "utils": ("mcl.utils",),
 }
 # Capas externas: conocen a los temas, pero ningún tema las conoce a ellas.
-_CAPAS_EXTERNAS = ("api", "db")
+_CAPAS_EXTERNAS = ("api", "web", "db")
 
 
 def _paquetes() -> list[str]:
@@ -108,7 +108,7 @@ def test_los_temas_no_importan_las_capas_externas(tema: str) -> None:
     assert not violaciones, f"{tema} solo puede usar core, utils y otros temas: {violaciones}"
 
 
-@pytest.mark.parametrize("capa", ["db"])
+@pytest.mark.parametrize("capa", ["web", "db"])
 def test_solo_la_capa_api_importa_web_y_db(capa: str) -> None:
     violaciones = {
         f"{archivo.relative_to(_RAIZ)} importa {modulo}"

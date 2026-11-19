@@ -1,0 +1,54 @@
+{% extends "admin.html" %}
+{% from "_macros.html" import icono %}
+{% block titulo %}Tablero{% endblock %}
+{% block contenido %}
+<header class="admin-head"><h1>Tablero</h1><p class="muted">Resumen de la operación de la plataforma</p></header>
+<div class="kpis">
+  <div class="kpi"><small>Solicitudes totales</small><b>{{ datos.total }}</b><span class="muted">{{ datos.ultimos_7_dias }} en los últimos 7 días</span></div>
+  <div class="kpi kpi-good"><small>Órdenes activas</small><b>{{ datos.activos }}</b><span class="muted">{{ datos.en_transito }} en tránsito</span></div>
+  <div class="kpi kpi-info"><small>Transportistas</small><b>{{ datos.transportistas }}</b><span class="muted">{{ datos.verificados }} verificados</span></div>
+  <div class="kpi kpi-warn"><small>Pendientes</small><b>{{ datos.pendientes }}</b><span class="muted">esperan respuesta</span></div>
+</div>
+<div class="admin-grid">
+  <section class="panel"><h2>Solicitudes por día</h2>
+    <svg class="chart" viewBox="0 0 {{ lineas.ancho }} {{ lineas.alto }}" role="img" aria-label="Solicitudes por día en los últimos {{ datos.serie_diaria | length }} días">
+      {% for marca in lineas.rejilla %}
+      <line x1="{{ lineas.izquierda }}" x2="{{ lineas.derecha }}" y1="{{ marca.y }}" y2="{{ marca.y }}" class="grid"/>
+      <text x="{{ marca.x }}" y="{{ marca.y + 4 }}" text-anchor="{{ marca.ancla }}" class="axis">{{ marca.texto }}</text>
+      {% endfor %}
+      <path d="{{ lineas.area }}" class="area"/>
+      <path d="{{ lineas.linea }}" class="line"/>
+      {% for marca in lineas.etiquetas %}<text x="{{ marca.x }}" y="{{ marca.y }}" text-anchor="{{ marca.ancla }}" class="axis">{{ marca.texto }}</text>{% endfor %}
+      <circle cx="{{ lineas.ultimo.x }}" cy="{{ lineas.ultimo.y }}" r="4.5" class="endpoint"/>
+    </svg>
+  </section>
+  <section class="panel"><h2>Estado de las solicitudes</h2>
+    <div class="donut-wrap">
+      <svg class="donut" viewBox="0 0 140 140" role="img" aria-label="Solicitudes por estado">
+        <g transform="rotate(-90 70 70)">
+          {% for s in dona.segmentos %}<circle r="{{ dona.radio }}" cx="70" cy="70" class="seg {{ s.clase }}" stroke-dasharray="{{ s.trazo }} {{ dona.circunferencia }}" stroke-dashoffset="{{ s.desplazamiento }}"/>{% endfor %}
+        </g>
+        <text x="70" y="68" text-anchor="middle" class="donut-n">{{ dona.total }}</text>
+        <text x="70" y="86" text-anchor="middle" class="axis">solicitudes</text>
+      </svg>
+      <ul class="legend">
+        {% for s in dona.leyenda %}<li><i class="{{ s.clase }}"></i>{{ s.etiqueta }}<b>{{ s.valor }}</b></li>{% endfor %}
+      </ul>
+    </div>
+  </section>
+</div>
+<div class="admin-grid">
+  <section class="panel"><h2>Solicitudes recientes</h2>
+    {% with envios=recientes, editable=False %}{% include "_tabla_envios.html" %}{% endwith %}
+    <a href="/admin/envios" class="link">Ver todas las solicitudes</a>
+  </section>
+  <section class="panel"><h2>Mejores transportistas</h2>
+    <ol class="rank">
+      {% for lugar in datos.ranking %}
+      <li><a href="/transportistas/{{ lugar.transportista.id }}">{{ lugar.transportista.nombre }}</a><span class="muted small"><span class="rating">{{ icono('star', 'ico-star') }}{{ '%.1f' | format(lugar.transportista.calificacion) }}</span></span><b class="mono">{{ lugar.viajes }} viajes</b></li>
+      {% endfor %}
+    </ol>
+    <p class="muted small">Valor entregado: <b class="mono">{{ datos.valor_entregado | dinero }} MXN</b></p>
+  </section>
+</div>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends "app.html" %}
+{% from "_macros.html" import barra %}
+{% block titulo %}Nueva solicitud{% endblock %}
+{% block contenido %}
+{{ barra('Nueva solicitud', volver=volver) }}
+<form class="section form" method="post" action="/solicitar" data-vivo="/solicitar/cotizacion" data-vivo-destino="#cotizacion">
+  {% if error %}<p class="alerta" role="alert">{{ error }}</p>{% endif %}
+  <div class="field"><label for="rq-transportista">Transportista</label>
+    <select id="rq-transportista" name="transportista">
+      {% for x in transportistas %}<option value="{{ x.id }}"{% if x.id == elegido.id %} selected{% endif %}>{{ x.nombre }} · {{ x.vehiculo.etiqueta }} {{ x.capacidad }}</option>{% endfor %}
+    </select></div>
+  <div class="row2">
+    <div class="field"><label for="rq-origen">Origen</label><select id="rq-origen" name="origen">
+      {% for z in Ciudad %}<option value="{{ z.value }}"{% if z == origen %} selected{% endif %}>{{ z.etiqueta }}</option>{% endfor %}
+    </select></div>
+    <div class="field"><label for="rq-destino">Destino</label><select id="rq-destino" name="destino">
+      {% for z in Ciudad %}<option value="{{ z.value }}"{% if z == destino %} selected{% endif %}>{{ z.etiqueta }}</option>{% endfor %}
+    </select></div>
+  </div>
+  <div class="row2">
+    <div class="field"><label for="rq-categoria">Tipo de carga</label><select id="rq-categoria" name="categoria">
+      {% for c in CategoriaServicio %}<option value="{{ c.value }}"{% if c == categoria %} selected{% endif %}>{{ c.etiqueta }}</option>{% endfor %}
+    </select></div>
+    <div class="field"><label for="rq-peso">Peso (kg)</label><input id="rq-peso" name="peso" type="number" min="1" step="1" value="{{ peso }}" required></div>
+  </div>
+  <div class="field"><label for="rq-fecha">Fecha de entrega deseada</label><input id="rq-fecha" name="fecha" type="date" min="{{ fecha_minima.isoformat() }}" value="{{ fecha.isoformat() }}" required></div>
+  <div class="field"><label for="rq-notas">Descripción de la carga</label><textarea id="rq-notas" name="notas" rows="3" maxlength="500" placeholder="Ej. 10 tarimas de 1.2 × 1 m, requiere rampa">{{ notas }}</textarea></div>
+  <div class="quote" id="cotizacion" aria-live="polite">
+{% include "_cotizacion.html" %}
+  </div>
+  <button class="btn btn-ghost btn-block sin-js" type="submit" formmethod="get" formaction="/solicitar" formnovalidate>Actualizar cotización</button>
+  <button class="btn btn-primary btn-block" type="submit" data-bloqueable{% if not cotizacion.valida %} disabled{% endif %}>Enviar solicitud</button>
+  <p class="muted small center">El transportista confirma o rechaza tu solicitud. En esta demostración no se realiza ningún cobro.</p>
+</form>
+{% endblock %}

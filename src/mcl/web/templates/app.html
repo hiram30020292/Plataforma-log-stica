@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% from "_macros.html" import icono, logo %}
+{% block cuerpo %}
+<div class="shell">
+  <div class="phone">
+    <main class="screen">
+{% block contenido %}{% endblock %}
+    </main>
+    {% set pestanas = [
+      ("inicio", "/", "Inicio", "home"),
+      ("buscar", "/buscar", "Buscar", "search"),
+      ("panel", "/panel", "Solicitudes", "box") if prefs.rol == Rol.TRANSPORTISTA else ("envios", "/envios", "Mis envíos", "box"),
+      ("perfil", "/perfil", "Perfil", "user"),
+    ] %}
+    <nav class="bottomnav" aria-label="Navegación principal">
+      {% for clave, ruta_tab, texto, ico in pestanas %}
+      <a href="{{ ruta_tab }}"{% if pestana == clave %} class="on" aria-current="page"{% endif %}>{{ icono(ico) }}<span>{{ texto }}</span></a>
+      {% endfor %}
+    </nav>
+    <div class="drawer-wrap" id="menu">
+      <a class="drawer-bg" href="#" aria-label="Cerrar menú"></a>
+      <aside class="drawer" aria-label="Menú">
+        <div class="drawer-head">{{ logo() }}<a class="icon-btn" href="#" aria-label="Cerrar menú">{{ icono('close') }}</a></div>
+        <p class="muted small">Modo: <b>{{ prefs.rol.etiqueta }}</b>{% if prefs.rol == Rol.CLIENTE %} · {{ prefs.empresa }}{% endif %}</p>
+        <nav>
+          <a href="/">{{ icono('home') }} Inicio</a>
+          <a href="/buscar">{{ icono('search') }} Catálogo de transportistas</a>
+          <a href="/modo/cliente?siguiente=/envios">{{ icono('box') }} Panel del cliente</a>
+          <a href="/modo/transportista?siguiente=/panel">{{ icono('truck') }} Panel del transportista</a>
+          <a href="/modo/administrador?siguiente=/admin">{{ icono('chart') }} Panel administrativo</a>
+          <a href="/registro">{{ icono('plus') }} Registrar transportista</a>
+          <a href="/perfil">{{ icono('user') }} Perfil y ajustes</a>
+        </nav>
+      </aside>
+    </div>
+  </div>
+</div>
+{% endblock %}

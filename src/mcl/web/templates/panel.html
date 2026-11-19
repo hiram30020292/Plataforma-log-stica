@@ -1,0 +1,42 @@
+{% extends "app.html" %}
+{% from "_macros.html" import icono, barra, arte, calificacion, insignia, boton_estado, vacio %}
+{% block titulo %}Panel del transportista{% endblock %}
+{% macro fila(envio) %}
+<div class="jrow">
+  <a href="/envios/{{ envio.id }}" class="jrow-main">
+    <b>{{ envio.origen.etiqueta }} → {{ envio.destino.etiqueta }}</b>
+    <small class="muted">{{ envio.folio }} · {{ envio.cliente }} · {{ envio.categoria.etiqueta }} · {{ envio.peso_kg | numero }} kg</small>
+    <small class="muted">Entrega {{ envio.fecha_entrega | fecha }} · <b class="mono">{{ envio.precio | dinero }}</b></small>
+  </a>
+  <div class="jrow-act">
+    {% if envio.estado != EstadoEnvio.PENDIENTE %}{{ insignia(envio.estado) }}{% endif %}
+    {% if envio.estado == EstadoEnvio.PENDIENTE %}
+    {{ boton_estado(envio, EstadoEnvio.RECHAZADO, ACCIONES[EstadoEnvio.RECHAZADO], '/panel', corto=True, extra='btn-sm') }}
+    {{ boton_estado(envio, EstadoEnvio.CONFIRMADO, ACCIONES[EstadoEnvio.CONFIRMADO], '/panel', corto=True, extra='btn-sm') }}
+    {% elif envio.estado == EstadoEnvio.CONFIRMADO %}
+    {{ boton_estado(envio, EstadoEnvio.EN_TRANSITO, ACCIONES[EstadoEnvio.EN_TRANSITO], '/panel', corto=True, extra='btn-sm') }}
+    {% elif envio.estado == EstadoEnvio.EN_TRANSITO %}
+    {{ boton_estado(envio, EstadoEnvio.ENTREGADO, ACCIONES[EstadoEnvio.ENTREGADO], '/panel', corto=True, extra='btn-sm') }}
+    {% endif %}
+  </div>
+</div>
+{% endmacro %}
+{% block contenido %}
+{{ barra('Panel del transportista') }}
+{% if t %}
+<section class="section">
+  <div class="company"><span class="avatar avatar-art">{{ arte(t.vehiculo, t.tono) }}</span><div><b>{{ t.nombre }}</b><small class="muted">{{ calificacion(t) }} · {{ t.vehiculo.etiqueta }} {{ t.capacidad }}</small></div><a class="btn btn-sm btn-ghost" href="/transportistas/{{ t.id }}">Mi perfil</a></div>
+  <div class="mini-kpis">
+    <div><small>Nuevas</small><b>{{ nuevas | length }}</b></div>
+    <div><small>En curso</small><b>{{ en_curso | length }}</b></div>
+    <div><small>Ingresos</small><b>{{ ingresos | dinero }}</b></div>
+  </div>
+  <p class="muted small">Operas como {{ t.nombre }}. Puedes cambiarlo en <a href="/perfil">Perfil</a>.</p>
+</section>
+<section class="section"><h2>Solicitudes nuevas</h2>{% for e in nuevas %}{{ fila(e) }}{% else %}<p class="muted">No tienes solicitudes nuevas por ahora.</p>{% endfor %}</section>
+<section class="section"><h2>Viajes en curso</h2>{% for e in en_curso %}{{ fila(e) }}{% else %}<p class="muted">Sin viajes activos.</p>{% endfor %}</section>
+<section class="section"><h2>Completados</h2>{% for e in completados %}{{ fila(e) }}{% else %}<p class="muted">Aún no completas viajes.</p>{% endfor %}</section>
+{% else %}
+<section class="section">{% call vacio('Aún no hay transportistas', 'Registra el primero para empezar a recibir solicitudes.') %}<a class="btn btn-primary" href="/registro">Registrar transportista</a>{% endcall %}</section>
+{% endif %}
+{% endblock %}

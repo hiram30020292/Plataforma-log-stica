@@ -1,0 +1,5 @@
+<div><small class="muted">Distancia aprox.</small><b class="mono">{{ cotizacion.distancia_km | numero }} km</b></div>
+<div><small class="muted">Cotización estimada</small><b class="mono big">{{ cotizacion.precio | dinero }} <small>MXN</small></b></div>
+{% for advertencia in cotizacion.advertencias %}
+<p class="warn" data-bloquea>{{ advertencia }}</p>
+{% endfor %}

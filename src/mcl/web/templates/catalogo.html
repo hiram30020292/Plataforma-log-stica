@@ -1,0 +1,31 @@
+{% extends "app.html" %}
+{% from "_macros.html" import icono, barra %}
+{% block titulo %}Transportistas{% endblock %}
+{% block contenido %}
+{{ barra('Transportistas', volver='/') }}
+<form class="filters" action="/buscar" method="get" data-vivo="/buscar/resultados" data-vivo-destino="#resultados" data-vivo-historial>
+  <label class="sr" for="f-q">Filtrar</label>
+  <div class="input-ico">{{ icono('search') }}<input id="f-q" name="q" value="{{ filtro.texto }}" placeholder="Filtrar por zona, tipo de vehículo…" autocomplete="off"></div>
+  <div class="chips">
+    <label class="chip"><span class="sr">Categoría</span><select name="categoria">
+      <option value="">Todas las categorías</option>
+      {% for c in CategoriaServicio %}<option value="{{ c.value }}"{% if filtro.categoria == c %} selected{% endif %}>{{ c.etiqueta }}</option>{% endfor %}
+    </select></label>
+    <label class="chip"><span class="sr">Ciudad</span><select name="ciudad">
+      <option value="">Toda zona</option>
+      {% for z in Ciudad %}<option value="{{ z.value }}"{% if filtro.ciudad == z %} selected{% endif %}>{{ z.etiqueta }}</option>{% endfor %}
+    </select></label>
+    <label class="chip"><span class="sr">Vehículo</span><select name="vehiculo">
+      <option value="">Vehículo</option>
+      {% for v in TipoVehiculo %}<option value="{{ v.value }}"{% if filtro.vehiculo == v %} selected{% endif %}>{{ v.etiqueta }}</option>{% endfor %}
+    </select></label>
+    <label class="chip"><span class="sr">Ordenar</span><select name="orden">
+      {% for o in OrdenCatalogo %}<option value="{{ o.value }}"{% if filtro.orden == o %} selected{% endif %}>{{ o.etiqueta }}</option>{% endfor %}
+    </select></label>
+  </div>
+  <button class="btn btn-ghost btn-sm sin-js">Filtrar</button>
+</form>
+<div class="clist" id="resultados" aria-live="polite">
+{% include "_resultados.html" %}
+</div>
+{% endblock %}

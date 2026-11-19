@@ -1,0 +1,32 @@
+{% extends "app.html" %}
+{% from "_macros.html" import barra %}
+{% block titulo %}Registro de transportista{% endblock %}
+{% block contenido %}
+{{ barra('Registro de transportista', volver='/perfil') }}
+<form class="section form" method="post" action="/registro">
+  <p class="muted">Publica tu perfil y empieza a recibir solicitudes de negocios.</p>
+  {% if error is defined and error %}<p class="alerta" role="alert">{{ error }}</p>{% endif %}
+  <div class="field"><label for="rg-nombre">Nombre comercial</label><input id="rg-nombre" name="nombre" value="{{ form.nombre }}" required maxlength="40" placeholder="Ej. Transportes Hernández"></div>
+  <div class="row2">
+    <div class="field"><label for="rg-ciudad">Ciudad base</label><select id="rg-ciudad" name="ciudad">
+      {% for z in Ciudad %}<option value="{{ z.value }}"{% if form.ciudad == z.value %} selected{% endif %}>{{ z.etiqueta }}</option>{% endfor %}
+    </select></div>
+    <div class="field"><label for="rg-telefono">Teléfono</label><input id="rg-telefono" name="telefono" value="{{ form.telefono }}" required inputmode="tel" maxlength="20" placeholder="442 000 0000"></div>
+  </div>
+  <div class="row2">
+    <div class="field"><label for="rg-vehiculo">Vehículo</label><select id="rg-vehiculo" name="vehiculo">
+      {% for v in TipoVehiculo %}<option value="{{ v.value }}"{% if form.vehiculo == v.value %} selected{% endif %}>{{ v.etiqueta }}</option>{% endfor %}
+    </select></div>
+    <div class="field"><label for="rg-capacidad">Capacidad (kg)</label><input id="rg-capacidad" name="capacidad" type="number" min="100" step="50" value="{{ form.capacidad }}" required placeholder="Ej. 3500"></div>
+  </div>
+  <div class="field"><label for="rg-tarifa">Tarifa base (MXN)</label><input id="rg-tarifa" name="tarifa" type="number" min="100" step="50" value="{{ form.tarifa }}" required></div>
+  <fieldset class="field"><legend>Servicios</legend><div class="checks">
+    {% for c in CategoriaServicio %}<label class="check"><input type="checkbox" name="categorias" value="{{ c.value }}"{% if c.value in form.categorias %} checked{% endif %}><span>{{ c.etiqueta }}</span></label>{% endfor %}
+  </div></fieldset>
+  <fieldset class="field"><legend>Cobertura (además de tu ciudad base)</legend><div class="checks">
+    {% for z in Ciudad %}<label class="check"><input type="checkbox" name="zonas" value="{{ z.value }}"{% if z.value in form.zonas %} checked{% endif %}><span>{{ z.etiqueta }}</span></label>{% endfor %}
+  </div></fieldset>
+  <div class="field"><label for="rg-descripcion">Descripción</label><textarea id="rg-descripcion" name="descripcion" rows="3" maxlength="500" placeholder="Tu flota, experiencia y diferenciadores">{{ form.descripcion }}</textarea></div>
+  <button class="btn btn-primary btn-block">Publicar perfil</button>
+</form>
+{% endblock %}

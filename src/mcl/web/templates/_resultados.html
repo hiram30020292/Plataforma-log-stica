@@ -1,0 +1,8 @@
+{% from "_macros.html" import tarjeta_transportista, vacio %}
+{% set n = resultados | length %}
+<p class="muted small results-count">{{ n }} transportista{{ '' if n == 1 else 's' }} disponible{{ '' if n == 1 else 's' }}</p>
+{% for t in resultados %}
+{{ tarjeta_transportista(t) }}
+{% else %}
+{% call vacio('Sin resultados', 'Prueba con otra zona o quita algún filtro.') %}<a class="btn btn-ghost" href="/buscar">Quitar filtros</a>{% endcall %}
+{% endfor %}

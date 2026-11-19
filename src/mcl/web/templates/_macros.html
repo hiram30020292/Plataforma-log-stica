@@ -1,0 +1,108 @@
+{# Piezas reutilizables de las pantallas. #}
+
+{% macro icono(nombre, clase='') -%}
+<svg class="ico {{ clase }}" viewBox="0 0 24 24" aria-hidden="true">{{ ICONOS[nombre] | safe }}</svg>
+{%- endmacro %}
+
+{% macro logo() -%}
+<a class="logo" href="/"><span class="logo-marca">{{ icono('truck') }}</span><span class="logo-texto"><b>MCL</b><small>Corregidora Móvil Logistics</small></span></a>
+{%- endmacro %}
+
+{% macro barra(titulo, volver='') -%}
+<header class="topbar">
+  {% if volver %}
+  <a class="icon-btn" href="{{ volver }}" aria-label="Volver">{{ icono('back') }}</a>
+  {% else %}
+  <a class="icon-btn" href="#menu" aria-label="Abrir menú">{{ icono('menu') }}</a>
+  {% endif %}
+  <h1 class="topbar-title">{{ titulo }}</h1>
+  <div class="topbar-right">{% if caller is defined %}{{ caller() }}{% endif %}</div>
+</header>
+{%- endmacro %}
+
+{% macro calificacion(t) -%}
+{% if t.num_opiniones %}
+<span class="rating">{{ icono('star', 'ico-star') }}<b>{{ '%.1f' | format(t.calificacion) }}</b></span> ({{ t.num_opiniones | numero }} opiniones)
+{%- else %}
+<span class="nuevo">Nuevo</span>
+{%- endif %}
+{%- endmacro %}
+
+{% macro insignia(estado) -%}
+<span class="badge {{ CLASE_ESTADO[estado] }}"><i></i>{{ estado.etiqueta }}</span>
+{%- endmacro %}
+
+{% macro estrellas(n) -%}
+<span class="stars-row" aria-label="{{ n }} de 5 estrellas">{{ '★' * n }}<i>{{ '★' * (5 - n) }}</i></span>
+{%- endmacro %}
+
+{% macro vacio(titulo, texto) -%}
+<div class="empty">{{ icono('box', 'ico-lg') }}<h3>{{ titulo }}</h3><p class="muted">{{ texto }}</p>{% if caller is defined %}{{ caller() }}{% endif %}</div>
+{%- endmacro %}
+
+{% macro _rueda(x) -%}
+<circle cx="{{ x }}" cy="78" r="7" fill="#1D2433"/><circle cx="{{ x }}" cy="78" r="3" fill="#9AA4B8"/>
+{%- endmacro %}
+
+{% macro _cabina(x, ancho, color, vidrio) -%}
+<path d="M{{ x }} 50h{{ ancho - 10 }}l10 12v14H{{ x }}z" fill="{{ color }}"/><path d="M{{ x + 4 }} 53h{{ ancho - 15 }}l7 9H{{ x + 4 }}z" fill="{{ vidrio }}"/>
+{%- endmacro %}
+
+{# Ilustración del vehículo de cada transportista; "tono" le da su color. #}
+{% macro arte(vehiculo, tono=214) -%}
+{% set id = 'cielo-' ~ vehiculo ~ '-' ~ tono %}
+{% set color = 'hsl(' ~ (16 + (tono - 190) // 4) ~ ' 34% 46%)' %}
+{% set vidrio = 'hsl(' ~ tono ~ ' 35% 86%)' %}
+<svg class="art" viewBox="0 0 160 100" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+<defs><linearGradient id="{{ id }}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="hsl({{ tono }} 30% 78%)"/><stop offset="1" stop-color="hsl({{ tono - 10 }} 34% 93%)"/></linearGradient></defs>
+<rect width="160" height="100" fill="url(#{{ id }})"/>
+<path d="M0 62 40 48 80 58 120 44 160 56V100H0z" fill="hsl(32 30% 77%)"/>
+<rect y="78" width="160" height="22" fill="hsl(200 12% 33%)"/>
+<path d="M8 89h18M44 89h18M80 89h18M116 89h18" stroke="hsl(40 30% 88%)" stroke-width="2"/>
+{% if vehiculo == TipoVehiculo.TRAILER %}
+<rect x="6" y="34" width="104" height="40" rx="2" fill="#FBF8F3"/><rect x="6" y="34" width="104" height="5" fill="{{ color }}"/>{{ _cabina(112, 34, color, vidrio) }}{{ _rueda(22) }}{{ _rueda(38) }}{{ _rueda(92) }}{{ _rueda(128) }}
+{% elif vehiculo == TipoVehiculo.CAMION %}
+<rect x="22" y="38" width="80" height="36" rx="2" fill="#FBF8F3"/><rect x="22" y="38" width="80" height="4" fill="{{ color }}"/>{{ _cabina(104, 32, color, vidrio) }}{{ _rueda(40) }}{{ _rueda(120) }}
+{% elif vehiculo == TipoVehiculo.VAN %}
+<path d="M30 46q0-8 8-8h62q8 0 16 10l12 12v16H30z" fill="#FBF8F3"/><path d="M98 43h6q5 0 10 6l6 7h-22z" fill="{{ vidrio }}"/><rect x="30" y="64" width="98" height="4" fill="{{ color }}"/>{{ _rueda(50) }}{{ _rueda(108) }}
+{% else %}
+<rect x="28" y="56" width="58" height="18" fill="{{ color }}"/>{{ _cabina(84, 38, color, vidrio) }}<rect x="34" y="48" width="44" height="10" rx="2" fill="#C9A36B"/>{{ _rueda(46) }}{{ _rueda(108) }}
+{% endif %}
+</svg>
+{%- endmacro %}
+
+{% macro tarjeta_transportista(t) -%}
+<article class="ccard">
+  <a class="ccard-art" href="/transportistas/{{ t.id }}" tabindex="-1" aria-hidden="true">{{ arte(t.vehiculo, t.tono) }}</a>
+  <div class="ccard-body">
+    <div class="ccard-head"><h3><a href="/transportistas/{{ t.id }}">{{ t.nombre }}</a></h3>{% if t.verificado %}<span class="verified" title="Verificado">{{ icono('shield') }}</span>{% endif %}</div>
+    <div class="muted small">{{ calificacion(t) }}</div>
+    <div class="muted small">{{ icono('pin', 'ico-sm') }} {{ t.ciudad.etiqueta }}</div>
+    <div class="ccard-foot">
+      <span class="tag">{{ t.vehiculo.etiqueta }} · {{ t.capacidad }}</span>
+      <span class="price"><small>Desde</small>{{ t.tarifa_base | dinero }}</span>
+    </div>
+    <a class="btn btn-primary btn-sm btn-block" href="/transportistas/{{ t.id }}">Ver perfil</a>
+  </div>
+</article>
+{%- endmacro %}
+
+{% macro fila_envio(envio) -%}
+<a class="rrow" href="/envios/{{ envio.id }}">
+  <span class="rrow-art">{{ arte(envio.transportista.vehiculo, envio.transportista.tono) }}</span>
+  <span class="rrow-body">
+    <b>{{ envio.origen.etiqueta }} → {{ envio.destino.etiqueta }}</b>
+    {{ insignia(envio.estado) }}
+    <small class="muted">{{ envio.folio }} · {{ 'Entregado' if envio.estado == EstadoEnvio.ENTREGADO else 'Entrega estimada' }}: {{ envio.fecha_entrega | fecha }}</small>
+  </span>
+  {{ icono('chev', 'muted') }}
+</a>
+{%- endmacro %}
+
+{% macro boton_estado(envio, estado, accion, volver, corto=False, extra='') -%}
+<form method="post" action="/envios/{{ envio.id }}/estado" class="inline" data-conservar-scroll>
+  <input type="hidden" name="estado" value="{{ estado.value }}">
+  <input type="hidden" name="volver" value="{{ volver }}">
+  <button class="btn {{ accion.clase }} {{ extra }}">{{ accion.texto_corto if corto else accion.texto }}</button>
+</form>
+{%- endmacro %}

@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#82ABBB">
+<title>{% block titulo %}{% endblock %} · MCL Corregidora Móvil Logistics</title>
+<link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="/static/fuentes/inter.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/static/mcl.css?v={{ version }}">
+<script src="/static/mcl.js?v={{ version }}" defer></script>
+</head>
+<body>
+{% block cuerpo %}{% endblock %}
+{% if aviso %}
+<div class="toast toast-{{ aviso.tipo }}" role="status" aria-live="polite">{{ aviso.mensaje }}</div>
+{% endif %}
+</body>
+</html>

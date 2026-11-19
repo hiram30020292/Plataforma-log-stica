@@ -1,0 +1,9 @@
+{% extends "app.html" %}
+{% from "_macros.html" import barra, vacio %}
+{% block titulo %}{{ titulo }}{% endblock %}
+{% block contenido %}
+{{ barra(titulo, volver='/') }}
+<section class="section">
+{% call vacio(titulo, mensaje) %}<a class="btn btn-primary" href="/">Ir al inicio</a>{% endcall %}
+</section>
+{% endblock %}

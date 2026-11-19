@@ -1,0 +1,28 @@
+{% extends "admin.html" %}
+{% block titulo %}Transportistas{% endblock %}
+{% macro interruptor(t, campo, encendido, texto) %}
+<form class="switch-form" method="post" action="/admin/transportistas/{{ t.id }}/marcas" data-conservar-scroll>
+  <input type="hidden" name="campo" value="{{ campo }}">
+  <label class="switch"><input type="checkbox" name="valor" value="1"{% if encendido %} checked{% endif %} data-autoenvio><span class="sr">{{ texto }} {{ t.nombre }}</span><i></i></label>
+  <button class="btn btn-ghost btn-sm sin-js">Guardar</button>
+</form>
+{% endmacro %}
+{% block contenido %}
+<header class="admin-head"><h1>Transportistas</h1><p class="muted">Verifica los perfiles antes de destacarlos en la portada</p></header>
+<section class="panel"><div class="table-wrap"><table class="table">
+  <thead><tr><th>Nombre</th><th>Ciudad</th><th>Vehículo</th><th class="num">Calificación</th><th class="num">Solicitudes</th><th>Verificado</th><th>Destacado</th></tr></thead>
+  <tbody>
+    {% for t in transportistas %}
+    <tr>
+      <td><a href="/transportistas/{{ t.id }}">{{ t.nombre }}</a></td>
+      <td>{{ t.ciudad.etiqueta }}</td>
+      <td>{{ t.vehiculo.etiqueta }} · {{ t.capacidad }}</td>
+      <td class="num mono">{{ '%.1f' | format(t.calificacion) if t.num_opiniones else '—' }}</td>
+      <td class="num mono">{{ solicitudes.get(t.id, 0) }}</td>
+      <td>{{ interruptor(t, 'verificado', t.verificado, 'Verificar') }}</td>
+      <td>{{ interruptor(t, 'destacado', t.destacado, 'Destacar') }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table></div></section>
+{% endblock %}

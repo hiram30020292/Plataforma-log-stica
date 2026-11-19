@@ -5,8 +5,10 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
+from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 
+from mcl.api import create_app
 from mcl.core import Settings, dispose_engines, get_engine, get_settings, new_session
 from mcl.db import target_metadata
 from mcl.demo import sembrar_datos_de_ejemplo
@@ -51,3 +53,14 @@ def sesion_demo(sesion: Session, ahora: datetime) -> Session:
     """Sesión con los datos de ejemplo cargados en el momento :data:`AHORA`."""
     sembrar_datos_de_ejemplo(sesion, ahora)
     return sesion
+
+
+@pytest.fixture
+def navegador() -> Iterator[TestClient]:
+    """Cliente que se presenta como navegador (pide páginas HTML) sobre la app completa.
+
+    La app aplica las migraciones y carga los datos de ejemplo al crearse, como al
+    arrancar el servidor de verdad.
+    """
+    with TestClient(create_app(), headers={"Accept": "text/html"}) as cliente:
+        yield cliente

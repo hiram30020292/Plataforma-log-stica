@@ -1,0 +1,26 @@
+{% from "_macros.html" import insignia %}
+<div class="table-wrap"><table class="table">
+  <thead><tr><th>Folio</th>{% if editable %}<th>Cliente</th>{% endif %}<th>Ruta</th>{% if editable %}<th>Transportista</th>{% endif %}<th class="num">Precio</th><th>Estado</th></tr></thead>
+  <tbody>
+    {% for envio in envios %}
+    <tr>
+      <td><a href="/envios/{{ envio.id }}" class="mono">{{ envio.folio }}</a></td>
+      {% if editable %}<td>{{ envio.cliente }}</td>{% endif %}
+      <td>{{ envio.origen.etiqueta }} → {{ envio.destino.etiqueta }}{% if not editable %}<br><small class="muted">{{ envio.cliente }}</small>{% endif %}</td>
+      {% if editable %}<td>{{ envio.transportista.nombre }}</td>{% endif %}
+      <td class="num mono">{{ envio.precio | dinero }}</td>
+      <td>
+        {% if editable %}
+        <form class="status-form" method="post" action="/admin/envios/{{ envio.id }}/estado" data-conservar-scroll>
+          <label class="sr" for="estado-{{ envio.id }}">Estado de {{ envio.folio }}</label>
+          <select id="estado-{{ envio.id }}" name="estado" class="status-select {{ CLASE_ESTADO[envio.estado] }}" data-autoenvio>
+            {% for e in EstadoEnvio %}<option value="{{ e.value }}"{% if e == envio.estado %} selected{% endif %}>{{ e.etiqueta }}</option>{% endfor %}
+          </select>
+          <button class="btn btn-ghost btn-sm sin-js">Guardar</button>
+        </form>
+        {% else %}{{ insignia(envio.estado) }}{% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table></div>

@@ -1,0 +1,8 @@
+{% extends "admin.html" %}
+{% block titulo %}Solicitudes{% endblock %}
+{% block contenido %}
+<header class="admin-head"><h1>Solicitudes y órdenes</h1><p class="muted">{{ envios | length }} registros · cambia el estado desde la tabla</p></header>
+<section class="panel">
+{% with editable=True %}{% include "_tabla_envios.html" %}{% endwith %}
+</section>
+{% endblock %}

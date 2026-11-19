@@ -1,0 +1,36 @@
+{% extends "app.html" %}
+{% from "_macros.html" import icono, barra, arte, estrellas %}
+{% block titulo %}{{ t.nombre }}{% endblock %}
+{% block contenido %}
+{{ barra('Perfil', volver='/buscar') }}
+<div class="detail-art">{{ arte(t.vehiculo, t.tono) }}</div>
+<section class="section detail">
+  <div class="detail-head">
+    <div><h2>{{ t.nombre }}</h2><p class="muted small">{{ icono('pin', 'ico-sm') }} {{ t.ciudad.etiqueta }}</p></div>
+    {% if t.verificado %}<span class="pill-verified">{{ icono('shield', 'ico-sm') }} Verificado</span>{% else %}<span class="pill-muted">En revisión</span>{% endif %}
+  </div>
+  <div class="stats3">
+    <div><b>{{ '%.1f' | format(t.calificacion) if t.num_opiniones else 'Nuevo' }}</b><small>{{ t.num_opiniones | numero }} opiniones</small></div>
+    <div><b>{{ viajes }}</b><small>viajes en la plataforma</small></div>
+    <div><b>{{ t.tarifa_base | dinero }}</b><small>tarifa base</small></div>
+  </div>
+  <p>{{ t.descripcion }}</p>
+  <dl class="facts">
+    <div><dt>Vehículo</dt><dd>{{ t.vehiculo.etiqueta }} · {{ t.capacidad }}</dd></div>
+    <div><dt>Servicios</dt><dd>{{ t.categorias | map(attribute='etiqueta') | join(', ') }}</dd></div>
+    <div><dt>Cobertura</dt><dd>{{ t.zonas | map(attribute='etiqueta') | join(', ') }}</dd></div>
+    <div><dt>Teléfono</dt><dd class="mono">{{ t.telefono }}</dd></div>
+  </dl>
+  <h3>Opiniones</h3>
+  {% if opiniones %}
+  <ul class="reviews">
+    {% for o in opiniones %}
+    <li><div class="review-head"><b>{{ o.autor }}</b>{{ estrellas(o.estrellas) }}</div><p>{{ o.texto }}</p><small class="muted">{{ o.creado_en | fecha }}</small></li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p class="muted">Aún no hay opiniones escritas.</p>
+  {% endif %}
+</section>
+<div class="sticky-cta"><a class="btn btn-primary btn-block" href="/solicitar?transportista={{ t.id }}">Solicitar servicio</a></div>
+{% endblock %}

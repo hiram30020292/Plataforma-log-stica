@@ -1,0 +1,58 @@
+{% extends "app.html" %}
+{% from "_macros.html" import icono, logo, arte, calificacion %}
+{% block titulo %}Inicio{% endblock %}
+{% block contenido %}
+<header class="topbar topbar-marca">
+  {{ logo() }}
+  <a class="icon-btn" href="#menu" aria-label="Abrir menú">{{ icono('menu') }}</a>
+</header>
+<section class="hero">
+  <div class="hero-art">{{ arte(TipoVehiculo.TRAILER, 216) }}</div>
+  <div class="hero-copy">
+    <h2>Conectamos negocios con transportistas</h2>
+    <p>Transportistas independientes de confianza para tu empresa, desde Corregidora.</p>
+    <form class="searchbar" action="/buscar" method="get" role="search">
+      <label class="sr" for="home-q">¿Qué necesitas transportar?</label>
+      <input id="home-q" name="q" placeholder="¿Qué necesitas transportar?" autocomplete="off">
+      <button class="btn btn-primary" aria-label="Buscar">{{ icono('search') }}</button>
+    </form>
+  </div>
+</section>
+<section class="section">
+  <div class="section-head"><h2>Categorías</h2><a href="/buscar">Ver todas {{ icono('chev', 'ico-sm') }}</a></div>
+  <div class="cats">
+    {% for c in categorias %}
+    <a href="/buscar?categoria={{ c.value }}" class="cat"><span class="cat-ico">{{ icono(ICONO_CATEGORIA[c]) }}</span>{{ c.etiqueta }}</a>
+    {% endfor %}
+  </div>
+</section>
+<section class="section">
+  <div class="section-head"><h2>Transportistas destacados</h2><a href="/buscar">Ver todos {{ icono('chev', 'ico-sm') }}</a></div>
+  <div class="flist">
+    {% for t in destacados %}
+    <a class="frow" href="/transportistas/{{ t.id }}">
+      <span class="frow-art">{{ arte(t.vehiculo, t.tono) }}</span>
+      <span class="frow-body"><b>{{ t.nombre }}</b><small>{{ calificacion(t) }}</small><small class="muted">{{ icono('pin', 'ico-sm') }} {{ t.ciudad.etiqueta }} · {{ t.vehiculo.etiqueta }}</small></span>
+      <span class="round-btn">{{ icono('chev') }}</span>
+    </a>
+    {% else %}
+    <p class="muted">Aún no hay transportistas destacados.</p>
+    {% endfor %}
+  </div>
+</section>
+<section class="section how">
+  <h2>¿Cómo funciona?</h2>
+  <ol class="steps">
+    <li><span class="step-ico">{{ icono('search') }}</span><div><b>Busca transportistas</b><small class="muted">Filtra por zona, tipo de vehículo y categoría.</small></div></li>
+    <li><span class="step-ico">{{ icono('list') }}</span><div><b>Compara perfiles y precios</b><small class="muted">Calificaciones reales y cotización al instante.</small></div></li>
+    <li><span class="step-ico">{{ icono('check') }}</span><div><b>Contrata tu servicio</b><small class="muted">Da seguimiento a tu envío hasta la entrega.</small></div></li>
+  </ol>
+</section>
+<section class="section">
+  <h2 class="center">Para todos</h2>
+  <div class="audience">
+    <a href="/modo/cliente?siguiente=/envios">{{ icono('building', 'ico-lg') }}<b>Negocios</b><small>que necesitan transportar</small></a>
+    <a href="/registro">{{ icono('truck', 'ico-lg') }}<b>Transportistas</b><small>que ofrecen sus servicios</small></a>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,59 @@
+{% extends "app.html" %}
+{% from "_macros.html" import icono, barra, insignia, boton_estado %}
+{% block titulo %}Envío {{ envio.folio }}{% endblock %}
+{% block contenido %}
+{{ barra('Envío ' ~ envio.folio, volver=volver) }}
+<section class="section">
+  <div class="ship-head"><h2>{{ envio.origen.etiqueta }} → {{ envio.destino.etiqueta }}</h2>{{ insignia(envio.estado) }}</div>
+  {% if mapa %}
+  {% set porcentaje = (mapa.avance * 100) | round | int %}
+  <figure class="map">
+    <svg viewBox="0 0 320 100" role="img" aria-label="Ruta de {{ envio.origen.etiqueta }} a {{ envio.destino.etiqueta }}, avance {{ porcentaje }}%">
+      <path d="{{ mapa.trazo }}" class="map-route"/>
+      <path d="{{ mapa.trazo }}" class="map-done" pathLength="1" stroke-dasharray="{{ mapa.avance }} 1"/>
+      <circle cx="{{ mapa.origen.x }}" cy="{{ mapa.origen.y }}" r="5" class="map-a"/>
+      <circle cx="{{ mapa.destino.x }}" cy="{{ mapa.destino.y }}" r="5" class="map-b"/>
+      {% if mapa.vehiculo %}
+      <circle cx="{{ mapa.vehiculo.x }}" cy="{{ mapa.vehiculo.y }}" r="9" class="map-truck"/>
+      <circle cx="{{ mapa.vehiculo.x }}" cy="{{ mapa.vehiculo.y }}" r="3.5" class="map-truck-c"/>
+      {% endif %}
+      <text x="{{ mapa.origen.x }}" y="{{ mapa.origen.y + 20 }}" text-anchor="start" class="map-label">{{ envio.origen.etiqueta }}</text>
+      <text x="{{ mapa.destino.x }}" y="{{ mapa.destino.y + 22 }}" text-anchor="end" class="map-label">{{ envio.destino.etiqueta }}</text>
+    </svg>
+    <figcaption class="muted small">{{ envio.distancia_km | numero }} km · {{ 'avance estimado ' ~ porcentaje ~ '%' if envio.estado == EstadoEnvio.EN_TRANSITO else envio.estado.etiqueta | lower }}</figcaption>
+  </figure>
+  {% endif %}
+  <dl class="facts">
+    <div><dt>Cliente</dt><dd>{{ envio.cliente }}</dd></div>
+    <div><dt>Transportista</dt><dd><a href="/transportistas/{{ envio.transportista.id }}">{{ envio.transportista.nombre }}</a> · {{ envio.transportista.vehiculo.etiqueta }}</dd></div>
+    <div><dt>Carga</dt><dd>{{ envio.categoria.etiqueta }} · <span class="mono">{{ envio.peso_kg | numero }} kg</span></dd></div>
+    <div><dt>Entrega estimada</dt><dd>{{ envio.fecha_entrega | fecha }}</dd></div>
+    <div><dt>Precio acordado</dt><dd class="mono"><b>{{ envio.precio | dinero }} MXN</b></dd></div>
+    {% if envio.notas %}<div><dt>Notas</dt><dd>{{ envio.notas }}</dd></div>{% endif %}
+  </dl>
+  <h3>Seguimiento</h3>
+  <ol class="timeline">
+    {% for paso in seguimiento %}
+    <li class="{{ CLASE_ESTADO[paso.estado] }}{% if paso.alcanzado %} done{% endif %}{% if paso.actual %} cur{% endif %}"><i></i><div><b>{{ paso.estado.etiqueta }}</b><small class="muted">{{ paso.momento | fecha_hora if paso.momento else 'Pendiente' }}</small></div></li>
+    {% endfor %}
+  </ol>
+  {% if acciones %}
+  <div class="actions{% if acciones | length == 2 %} row2{% endif %}">
+    {% for estado, accion in acciones %}{{ boton_estado(envio, estado, accion, ruta, extra='btn-block') }}{% endfor %}
+  </div>
+  {% endif %}
+  {% if puede_calificar %}
+  <form class="rate" method="post" action="/envios/{{ envio.id }}/calificacion">
+    <h3>¿Cómo te fue con {{ envio.transportista.nombre }}?</h3>
+    <fieldset class="star-input" aria-label="Calificación">
+      {% for n in [5, 4, 3, 2, 1] %}<input type="radio" name="estrellas" id="st-{{ n }}" value="{{ n }}"{% if n == 5 %} checked{% endif %}><label for="st-{{ n }}" title="{{ n }} estrellas">★</label>{% endfor %}
+    </fieldset>
+    <label class="sr" for="rate-text">Comentario</label>
+    <textarea id="rate-text" name="texto" rows="2" maxlength="500" placeholder="Cuéntanos sobre el servicio (opcional)"></textarea>
+    <button class="btn btn-primary btn-block">Enviar calificación</button>
+  </form>
+  {% elif envio.calificacion %}
+  <p class="rated">{{ envio.cliente }} calificó este servicio con <b>{{ '★' * envio.calificacion }}</b></p>
+  {% endif %}
+</section>
+{% endblock %}
