@@ -16,6 +16,24 @@ Alembic (base de datos y migraciones). Usa SQLite en desarrollo y PostgreSQL en 
 |---|---|---|
 | ![Inicio](docs/capturas/inicio.png) | ![Seguimiento](docs/capturas/envio.png) | ![Panel](docs/capturas/admin.png) |
 
+## Verla funcionando en GitHub, sin instalar nada
+
+GitHub Pages solo publica páginas estáticas y no puede correr un servidor de Python. GitHub
+Codespaces sí puede: abre el proyecto en una máquina en la nube, desde el navegador.
+
+[![Abrir en GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/hiram30020292/Plataforma-log-stica?quickstart=1)
+
+1. Haz clic en el botón de arriba, o en el repositorio entra a **Code → Codespaces → Create
+   codespace on main**.
+2. Espera unos minutos la primera vez: se instalan las dependencias y la app arranca sola.
+3. La app se abre en otra pestaña. Si no se abre, ve a la pestaña **Ports** (Puertos) de
+   abajo y haz clic en el globo de la fila **8000**.
+4. Para que otras personas la vean, en **Ports** haz clic derecho en el puerto 8000 →
+   **Port Visibility → Public** y comparte la dirección.
+
+El codespace se detiene solo después de un rato sin uso. Las cuentas personales tienen
+horas gratis cada mes; los codespaces se administran en https://github.com/codespaces.
+
 ## Qué incluye
 
 **Para los negocios (cliente)**
