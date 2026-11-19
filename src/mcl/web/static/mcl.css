@@ -88,7 +88,9 @@ small { font-size: .8rem; }
 }
 @media (min-width: 620px) {
   .shell { padding-block: 24px; }
-  .phone { min-height: calc(100vh - 48px); border-radius: 28px; box-shadow: var(--shadow); overflow: hidden; border: 1px solid var(--border); }
+  /* overflow: clip recorta las esquinas sin romper las barras fijas (sticky); los navegadores
+     antiguos se quedan con hidden. */
+  .phone { min-height: calc(100vh - 48px); border-radius: 28px; box-shadow: var(--shadow); overflow: hidden; overflow: clip; border: 1px solid var(--border); }
 }
 .screen { display: flex; flex-direction: column; gap: 6px; }
 
