@@ -13,8 +13,9 @@ El resto del código obtiene la configuración solo con :func:`get_settings`.
 from enum import StrEnum
 from functools import lru_cache
 from typing import Self
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
-from pydantic import Field, SecretStr, ValidationError, model_validator
+from pydantic import Field, SecretStr, ValidationError, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from mcl.core.exceptions import ConfiguracionError
@@ -48,6 +49,13 @@ class Settings(BaseSettings):
     # SQLite en desarrollo. En producción basta con apuntar a PostgreSQL.
     database_url: str = "sqlite:///./mcl.db"
 
+    # Zona horaria para mostrar fechas y saber qué día es "hoy". Las fechas se guardan en UTC.
+    timezone: str = "America/Mexico_City"
+
+    # Datos de ejemplo: se cargan al arrancar si la base está vacía y se pueden restablecer
+    # desde la app. En producción se apagan con MCL_DEMO_DATA=false.
+    demo_data: bool = True
+
     # Avisos por correo con Gmail (SMTP con STARTTLS). La contraseña es una
     # "contraseña de aplicación" de Google, no la contraseña normal de la cuenta.
     smtp_host: str = "smtp.gmail.com"
@@ -55,12 +63,27 @@ class Settings(BaseSettings):
     smtp_user: str | None = None
     smtp_password: SecretStr | None = None
 
+    @field_validator("timezone")
+    @classmethod
+    def _check_timezone(cls, value: str) -> str:
+        try:
+            ZoneInfo(value)
+        except (ZoneInfoNotFoundError, ValueError) as exc:
+            msg = "MCL_TIMEZONE debe ser una zona horaria válida, por ejemplo America/Mexico_City."
+            raise ValueError(msg) from exc
+        return value
+
     @model_validator(mode="after")
     def _check_smtp_credentials(self) -> Self:
         if (self.smtp_user is None) != (self.smtp_password is None):
             msg = "MCL_SMTP_USER y MCL_SMTP_PASSWORD deben definirse juntas (o ninguna)."
             raise ValueError(msg)
         return self
+
+    @property
+    def tz(self) -> ZoneInfo:
+        """Zona horaria configurada, lista para convertir fechas."""
+        return ZoneInfo(self.timezone)
 
     @property
     def email_enabled(self) -> bool:

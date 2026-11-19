@@ -5,11 +5,17 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "mcl"
 dynamic = ["version"]
-description = "MCL - Corregidora Móvil Logistics: API de gestión de flotilla y logística."
+description = "MCL - Corregidora Móvil Logistics: plataforma web y API de logística en Python."
 requires-python = ">=3.12"
 dependencies = [
+    "alembic>=1.16",
     "fastapi>=0.115",
+    "jinja2>=3.1",
     "pydantic-settings>=2.6",
+    "python-multipart>=0.0.18",
+    "sqlalchemy>=2.1",
+    # Windows no trae la base de zonas horarias que usa zoneinfo.
+    "tzdata>=2024.1",
     "uvicorn>=0.32",
 ]
 
@@ -22,6 +28,8 @@ dev = [
     "pytest>=8.3",
     "ruff>=0.8",
 ]
+# Controlador de PostgreSQL para producción (MCL_DATABASE_URL=postgresql+psycopg://...).
+postgres = ["psycopg[binary]>=3.2"]
 
 # --------------------------------------------------------------------------- empaquetado
 [tool.setuptools]
@@ -31,10 +39,26 @@ package-dir = { "" = "src" }
 where = ["src"]
 
 [tool.setuptools.package-data]
-mcl = ["py.typed"]
+mcl = [
+    "py.typed",
+    "db/migrations/*.py",
+    "db/migrations/*.mako",
+    "db/migrations/versions/*.py",
+    "web/templates/*.html",
+    "web/static/*",
+    "web/static/fuentes/*",
+]
 
 [tool.setuptools.dynamic]
 version = { attr = "mcl.__version__" }
+
+# --------------------------------------------------------------------------- alembic
+[tool.alembic]
+# Las migraciones viven dentro del paquete para que la app las aplique al arrancar.
+script_location = "mcl.db:migrations"
+# Archivos como m0002_agrega_agenda.py: empiezan con letra para ser módulos válidos.
+file_template = "m%%(rev)s_%%(slug)s"
+path_separator = "os"
 
 # --------------------------------------------------------------------------- pytest
 [tool.pytest.ini_options]
